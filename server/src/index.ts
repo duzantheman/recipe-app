@@ -163,16 +163,12 @@ const server = new ApolloServer<Context>({
   resolvers,
 })
 
-const start = async () => {
-  const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
-    context: async () => ({
-      // fake loading of the DB using hardcoded data
-      db: await Promise.resolve({ recipes }),
-    }),
-  })
+const { url } = await startStandaloneServer(server, {
+  listen: { port: 4000 },
+  context: async () => ({
+    // fake loading of the DB using hardcoded data
+    db: await Promise.resolve({ recipes }),
+  }),
+})
 
-  console.debug(`🚀  Server ready at: ${url}`)
-}
-
-start()
+console.debug(`🚀  Server ready at: ${url}`)
