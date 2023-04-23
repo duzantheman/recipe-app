@@ -1,58 +1,111 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
-const typeDefs = `#graphql
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
+import { recipes } from './data.js'
+import { RecipeEntry } from './types.js'
 
-  # This "Book" type defines the queryable fields for every book in our data source.
-  type Book {
-    title: String
-    author: String
+const typeDefs = `#graphql
+  # TODO: do we just want to store one for of each and convert it as part of the saving process?
+  enum MeasuringUnit {
+    # -- VOLUME
+    TEASPOON
+    TABLESPOON
+    FLUID_OUNCE
+    CUP
+    PINT
+    QUART
+    GALLON
+    MILLILITER
+    LITER
+    DECILITER
+    # -- MASS
+    POUND
+    OUNCE
+    MILLIGRAM
+    GRAM
+    KILOGRAM
   }
 
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
+  type Ingredient {
+    amount: Float
+    unit: MeasuringUnit
+    description: String
+    item: String!
+  }
+
+  # TODO: add more details later (sugar, type of fat, micros, etc)
+  type NutritionFacts {
+    calories: Int!
+    protein: Int!
+    carbohydrates: Int!
+    fats: Int!
+  }
+
+  type Recipe {
+    id: ID!
+    title: String!
+    source: String
+    servings: Int
+    prepTime: Int # time in minutes
+    cookTime: Int # time in minutes
+    ingredients: [Ingredient!]!
+    prepSteps: [String]
+    cookSteps: [String!]!
+    nutritionFacts: NutritionFacts
+    notes: String
+    favorite: Boolean
+    tags: [String]
+    image: String
+  }
+
   type Query {
-    books: [Book]
+    recipes: [Recipe]
+    recipe(id: ID!): Recipe
   }
 `
 
-const books = [
-  {
-    title: 'The Awakening',
-    author: 'Kate Chopin',
-  },
-  {
-    title: 'City of Glass',
-    author: 'Paul Auster',
-  },
-]
+const Recipe = {
+  id: ({ id }: RecipeEntry) => id,
+  title: ({ title }: RecipeEntry) => title,
+  source: ({ source }: RecipeEntry) => source,
+  servings: ({ servings }: RecipeEntry) => servings,
+  prepTime: ({ prepTime }: RecipeEntry) => prepTime,
+  cookTime: ({ cookTime }: RecipeEntry) => cookTime,
+  ingredients: ({ ingredients }: RecipeEntry) => ingredients,
+  prepSteps: ({ prepSteps }: RecipeEntry) => prepSteps,
+  cookSteps: ({ cookSteps }: RecipeEntry) => cookSteps,
+  nutritionFacts: ({ nutritionFacts }: RecipeEntry) => nutritionFacts,
+  notes: ({ notes }: RecipeEntry) => notes,
+  favorite: ({ favorite }: RecipeEntry) => favorite,
+  tags: ({ tags }: RecipeEntry) => tags,
+  image: ({ image }: RecipeEntry) => image,
+}
 
-// Resolvers define how to fetch the types defined in your schema.
-// This resolver retrieves books from the "books" array above.
+const recipesList = (): RecipeEntry[] => recipes
+const recipeById = (
+  _parent: unknown,
+  args: { id: string },
+): RecipeEntry | undefined => recipes.find((recipe) => recipe.id === args.id)
+
 const resolvers = {
+  Recipe,
   Query: {
-    books: () => books,
+    recipes: recipesList,
+    recipe: recipeById,
   },
 }
 
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 })
 
-// Passing an ApolloServer instance to the `startStandaloneServer` function:
-//  1. creates an Express app
-//  2. installs your ApolloServer instance as middleware
-//  3. prepares your app to handle incoming requests
-const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
-})
+const start = async () => {
+  const { url } = await startStandaloneServer(server, {
+    listen: { port: 4000 },
+  })
 
-console.debug(`🚀  Server ready at: ${url}`)
+  console.debug(`🚀  Server ready at: ${url}`)
+}
+
+start()
