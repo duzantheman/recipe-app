@@ -7,7 +7,7 @@
     "start": "tsc && node ./dist/index.js",
     "dev": "ts-node ./src/index.ts",
     "lint": "eslint src --ext .ts --fix --quiet",
-    "prettier-format": "prettier --config .prettierrc.js \"./src/**/*\" --write",
+    "prettier-format": "prettier --config .prettierrc.cjs \"./src/**/*\" --write",
     "format": "npm run lint && npm run prettier-format"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
     "@apollo/server": "^4.7.0",
     "graphql": "^16.6.0"
   },
+  "type": "module",
   "devDependencies": {
     "@cgduzan/eslint-config": "^1.0.3",
     "@cgduzan/prettier-config": "^1.0.0",
