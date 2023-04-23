@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node ./dist/index.js",
+    "dev": "ts-node ./src/index.ts",
+    "lint": "eslint src --ext .ts --fix --quiet",
+    "prettier-format": "prettier --config .prettierrc.js \"./src/**/*\" --write",
+    "format": "npm run lint && npm run prettier-format"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^4.7.0",
+    "graphql": "^16.6.0"
+  },
+  "devDependencies": {
+    "@cgduzan/eslint-config": "^1.0.3",
+    "@cgduzan/prettier-config": "^1.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/node": "^18.15.13",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "eslint": "^8.39.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "eslintConfig": {
+    "extends": "@cgduzan/eslint-config/common"
+  }
+}
