@@ -1,4 +1,4 @@
-import { MeasuringUnit, RecipeEntry } from './types.js'
+import { MeasuringUnit, RecipeEntry } from './modules/recipes/Recipe.js'
 
 // -- Hardcoded DB data
 export const recipes: RecipeEntry[] = [
