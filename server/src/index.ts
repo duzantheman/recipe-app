@@ -1,8 +1,9 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
+import { v4 as uuid } from 'uuid'
 
 import { recipes } from './data.js'
-import { RecipeEntry } from './types.js'
+import { AddRecipeInput, RecipeEntry } from './types.js'
 
 const typeDefs = `#graphql
   # TODO: do we just want to store one for of each and convert it as part of the saving process?
@@ -62,6 +63,39 @@ const typeDefs = `#graphql
     recipes: [Recipe]
     recipe(id: ID!): Recipe
   }
+
+  input IngredientInput {
+    amount: Float
+    unit: MeasuringUnit
+    description: String
+    item: String!
+  }
+
+  input NutritionFactsInput {
+    calories: Int!
+    protein: Int!
+    carbohydrates: Int!
+    fats: Int!
+  }
+
+  input AddRecipeInput {
+    title: String!,
+    source: String,
+    servings: Int,
+    prepTime: Int,
+    cookTime: Int,
+    ingredients: [IngredientInput!]!,
+    prepSteps: [String],
+    cookSteps: [String!]!,
+    nutritionFacts: NutritionFactsInput,
+    notes: String,
+    favorite: Boolean,
+    tags: [String],
+  }
+
+  type Mutation {
+    addRecipe(input: AddRecipeInput!): Recipe!
+  }
 `
 
 const Recipe = {
@@ -87,11 +121,28 @@ const recipeById = (
   args: { id: string },
 ): RecipeEntry | undefined => recipes.find((recipe) => recipe.id === args.id)
 
+const addRecipe = (
+  _parent: unknown,
+  { input: recipe }: { input: AddRecipeInput },
+) => {
+  const newRecipe = {
+    ...recipe,
+    id: uuid(),
+  }
+
+  recipes.push(newRecipe)
+
+  return newRecipe
+}
+
 const resolvers = {
   Recipe,
   Query: {
     recipes: recipesList,
     recipe: recipeById,
+  },
+  Mutation: {
+    addRecipe,
   },
 }
 

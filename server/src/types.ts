@@ -33,6 +33,22 @@ type NutritionFacts = {
   fats: number
 }
 
+export type AddRecipeInput = {
+  title: string
+  source?: string
+  servings?: number
+  prepTime?: number
+  cookTime?: number
+  ingredients: Ingredient[]
+  prepSteps: string[]
+  cookSteps: string[]
+  nutritionFacts?: NutritionFacts
+  notes?: string
+  favorite?: boolean
+  tags: string[]
+  image?: string
+}
+
 export type RecipeEntry = {
   id: string
   title: string
