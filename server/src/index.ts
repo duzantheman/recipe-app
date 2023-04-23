@@ -115,22 +115,28 @@ const Recipe = {
   image: ({ image }: RecipeEntry) => image,
 }
 
-const recipesList = (): RecipeEntry[] => recipes
+const recipesList = (
+  _parent: unknown,
+  _args: unknown,
+  { db }: Context,
+): RecipeEntry[] => db.recipes
 const recipeById = (
   _parent: unknown,
   args: { id: string },
-): RecipeEntry | undefined => recipes.find((recipe) => recipe.id === args.id)
+  { db }: Context,
+): RecipeEntry | undefined => db.recipes.find((recipe) => recipe.id === args.id)
 
 const addRecipe = (
   _parent: unknown,
   { input: recipe }: { input: AddRecipeInput },
+  { db }: Context,
 ) => {
   const newRecipe = {
     ...recipe,
     id: uuid(),
   }
 
-  recipes.push(newRecipe)
+  db.recipes.push(newRecipe)
 
   return newRecipe
 }
@@ -146,7 +152,13 @@ const resolvers = {
   },
 }
 
-const server = new ApolloServer({
+type Context = {
+  db: {
+    recipes: RecipeEntry[]
+  }
+}
+
+const server = new ApolloServer<Context>({
   typeDefs,
   resolvers,
 })
@@ -154,6 +166,10 @@ const server = new ApolloServer({
 const start = async () => {
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
+    context: async () => ({
+      // fake loading of the DB using hardcoded data
+      db: await Promise.resolve({ recipes }),
+    }),
   })
 
   console.debug(`🚀  Server ready at: ${url}`)
